@@ -1,0 +1,202 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #323232 !important;
+    color: #fff;
+}
+
+main {
+    flex: 1;
+}
+
+.navbar, .footer {
+    background: #151515 !important;
+    color: #fff;
+    box-shadow: none;
+}
+
+.card, .download-block {
+    border: none !important;
+    border-radius: 18px !important;
+    background: #2A2A2A !important;
+    color: #fff;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10) !important;
+}
+
+.download-block {
+    width: 280px;
+    height: 270px;
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 18px 14px 14px 14px;
+    border-radius: 16px !important;
+}
+
+.img-fluid.rounded.shadow, .img-fluid.rounded.shadow-lg, .img-fluid.rounded.shadow-sm {
+    border-radius: 18px !important;
+    background: #2A2A2A;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10) !important;
+}
+
+.input-group {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    gap: 12px;
+    margin-bottom: 16px !important;
+    align-items: center;
+}
+
+.form-control,
+.form-control:focus,
+.form-control:active,
+.form-control:visited {
+    background: #2A2A2A !important;
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+    border: 1.5px solid #404040 !important;
+    border-radius: 8px !important;
+    font-size: 1.1em;
+    padding: 0 16px !important;
+    box-shadow: none !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    transition: none !important;
+}
+
+/* Для автозаполнения Chrome/Safari */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:focus,
+.form-control:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #2A2A2A inset !important;
+    box-shadow: 0 0 0 1000px #2A2A2A inset !important;
+    -webkit-text-fill-color: #fff !important;
+    color: #fff !important;
+    border: 1.5px solid #404040 !important;
+}
+
+.form-control::placeholder {
+    color: #fff !important;
+    opacity: 0.7;
+}
+
+.input-group-lg > .form-control, .input-group-lg > .input-group-text {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    font-size: 18px;
+    border-radius: 8px !important;
+}
+
+.btn-success, .btn-success:focus, .btn-success:active, .btn-success:visited {
+    background-color: #00BC45 !important;
+    border: none !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    font-weight: 500;
+    font-size: 1.1em;
+    box-shadow: none !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+    transition: none !important;
+    padding-top: 0;
+    padding-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-success:hover {
+    background-color: #009c38 !important;
+    border: none !important;
+}
+
+.custom-g-16 > .col {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.custom-g-16 {
+    --bs-gutter-x: 16px !important;
+    --bs-gutter-y: 16px !important;
+    row-gap: 16px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    justify-content: center !important;
+}
+
+.resolution {
+    font-size: 35px;
+    font-weight: bold;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.format-label {
+    color: #b0b0b0;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.info-icon {
+    margin-right: 12px;
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+/* Расширенный фон для всего контента */
+.main-content-bg {
+    background: none !important;
+    border-radius: 0;
+    padding: 0;
+    margin: 0 auto !important;
+    max-width: 1240px !important;
+    width: 100%;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-shadow: none;
+}
+
+/* Новый фон для страницы */
+body {
+    background: #22262a;
+    color: #fff;
+}
+
+.main-content-bg, .navbar, .footer {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.video-header-block {
+    background: #2A2A2A;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
+    padding: 24px 24px 18px 24px;
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+#searchForm {
+    margin-bottom: 24px !important;
+} 
