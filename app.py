@@ -62,50 +62,34 @@ def download_video():
         try:
             save_path = os.path.join('static', 'downloads')
             os.makedirs(save_path, exist_ok=True)
-            outtmpl = os.path.join(save_path, '%(title)s.%(ext)s')
             
-            # Базовые опции
-            ydl_opts = {
-                'format': format_id if format_id else 'bestvideo+bestaudio/best',
-                'outtmpl': outtmpl,
-                'merge_output_format': 'mp4',
-                'quiet': False,
-                'no_warnings': False,
-                'nocheckcertificate': True,
-                'ignoreerrors': True,
-                'no_check_certificates': True,
-                'http_headers': {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                    'Accept-Language': 'en-US,en;q=0.5',
-                    'Connection': 'keep-alive',
-                    'Upgrade-Insecure-Requests': '1',
-                    'Sec-Fetch-Dest': 'document',
-                    'Sec-Fetch-Mode': 'navigate',
-                    'Sec-Fetch-Site': 'none',
-                    'Sec-Fetch-User': '?1',
-                    'DNT': '1',
-                }
-            }
+            yt = YouTube(url)
             
-            # Добавляем cookies из браузера, если доступны
-            ydl_opts.update(get_browser_cookies())
+            if format_id:
+                stream = yt.streams.get_by_itag(int(format_id))
+            else:
+                stream = yt.streams.get_highest_resolution()
+                
+            if not stream:
+                progress_dict[task_id]['status'] = 'error'
+                progress_dict[task_id]['error'] = 'Не удалось найти подходящий формат'
+                return
+                
+            # Скачиваем файл
+            filename = stream.download(output_path=save_path)
             
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                print(f"Начинаем скачивание: {url}")
-                info = ydl.extract_info(url)
-                if info:
-                    filename = ydl.prepare_filename(info)
-                    file_url = '/static/downloads/' + os.path.basename(filename)
-                    progress_dict[task_id]['file_url'] = file_url
-                    progress_dict[task_id]['status'] = 'finished'
-                    progress_dict[task_id]['progress'] = 100.0
-                    print(f"Скачивание завершено: {filename}")
-                else:
-                    progress_dict[task_id]['status'] = 'error'
-                    progress_dict[task_id]['error'] = 'Не удалось скачать видео'
-                    print("Ошибка: информация о видео не получена")
-                    
+            # Если это аудио, конвертируем в mp3
+            if stream.mime_type.startswith('audio'):
+                base, _ = os.path.splitext(filename)
+                new_filename = base + '.mp3'
+                os.rename(filename, new_filename)
+                filename = new_filename
+            
+            file_url = '/static/downloads/' + os.path.basename(filename)
+            progress_dict[task_id]['file_url'] = file_url
+            progress_dict[task_id]['status'] = 'finished'
+            progress_dict[task_id]['progress'] = 100.0
+            
         except Exception as e:
             print(f"Ошибка при скачивании: {str(e)}")
             progress_dict[task_id]['status'] = 'error'
@@ -136,84 +120,49 @@ def get_video_info():
         if not url:
             return jsonify({'error': 'URL не указан'}), 400
 
-        # Базовые опции
-        ydl_opts = {
-            'quiet': False,
-            'no_warnings': False,
-            'extract_flat': False,
-            'socket_timeout': 30,
-            'format': 'best',
-            'nocheckcertificate': True,
-            'ignoreerrors': True,
-            'no_check_certificates': True,
-            'extractor_retries': 5,
-            'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Connection': 'keep-alive',
-                'Upgrade-Insecure-Requests': '1',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'none',
-                'Sec-Fetch-User': '?1',
-                'DNT': '1',
-            }
-        }
-        
-        # Добавляем cookies из браузера, если доступны
-        ydl_opts.update(get_browser_cookies())
-        
         try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                print(f"Получаем информацию для URL: {url}")
-                try:
-                    info = ydl.extract_info(url, download=False)
-                    if not info:
-                        print("Информация не получена")
-                        return jsonify({
-                            'error': 'Не удалось получить информацию о видео'
-                        }), 400
-                    
-                    print(f"Получена информация: {info.get('title')}")
-                    
-                    # Получаем доступные форматы
-                    formats = []
-                    if 'formats' in info:
-                        for f in info['formats']:
-                            if f.get('ext') in ['mp4', 'webm', 'm4a', 'mp3']:
-                                formats.append({
-                                    'format_id': f.get('format_id'),
-                                    'ext': f.get('ext'),
-                                    'format_note': f.get('format_note'),
-                                    'filesize': f.get('filesize'),
-                                    'filesize_approx': f.get('filesize_approx'),
-                                    'height': f.get('height'),
-                                    'width': f.get('width'),
-                                    'tbr': f.get('tbr'),
-                                    'acodec': f.get('acodec'),
-                                    'vcodec': f.get('vcodec'),
-                                    'fps': f.get('fps'),
-                                })
-                    info['formats'] = formats
-                    return jsonify(info)
-                    
-                except yt_dlp.utils.DownloadError as e:
-                    error_str = str(e)
-                    print(f"yt-dlp ошибка загрузки: {error_str}")
-                    if "Sign in to confirm you're not a bot" in error_str:
-                        return jsonify({
-                            'error': 'YouTube требует подтверждение. Пожалуйста, попробуйте позже.'
-                        }), 429
-                    return jsonify({
-                        'error': 'Не удалось получить информацию о видео. Проверьте ссылку.'
-                    }), 400
+            # Используем pytube для получения информации
+            yt = YouTube(url)
+            
+            # Получаем доступные форматы
+            formats = []
+            for stream in yt.streams.filter(progressive=True):
+                formats.append({
+                    'format_id': stream.itag,
+                    'ext': stream.mime_type.split('/')[-1],
+                    'format_note': f"{stream.resolution} ({stream.mime_type.split('/')[-1]})",
+                    'filesize': stream.filesize,
+                    'height': int(stream.resolution.replace('p', '')),
+                    'width': int(stream.resolution.replace('p', '')) * 16 // 9,
+                    'fps': stream.fps,
+                })
+            
+            # Добавляем аудио формат
+            audio_stream = yt.streams.filter(only_audio=True).first()
+            if audio_stream:
+                formats.append({
+                    'format_id': audio_stream.itag,
+                    'ext': 'mp3',
+                    'format_note': 'Audio Only (mp3)',
+                    'filesize': audio_stream.filesize,
+                    'acodec': 'mp3',
+                })
+
+            info = {
+                'title': yt.title,
+                'thumbnail': yt.thumbnail_url,
+                'duration': yt.length,
+                'formats': formats,
+                'webpage_url': url,
+            }
+            
+            return jsonify(info)
                     
         except Exception as e:
-            print(f"Общая ошибка yt-dlp: {str(e)}")
+            print(f"Ошибка при получении информации: {str(e)}")
             return jsonify({
-                'error': f'Ошибка при получении информации о видео: {str(e)}'
-            }), 500
+                'error': 'Не удалось получить информацию о видео. Проверьте ссылку.'
+            }), 400
                 
     except Exception as e:
         print(f"Неожиданная ошибка: {str(e)}")
