@@ -31,6 +31,23 @@ def is_supported_url(url):
     instagram_pattern = r'^(https?://)?((?:www\.)?instagram\.com/(?:p|reel|tv|reels|stories)/[a-zA-Z0-9_-]+(?:/\?.*)?|instagram\.com/[^/]+/[^/]+)$'
     return bool(re.match(youtube_pattern, url) or re.match(tiktok_pattern, url) or re.match(instagram_pattern, url))
 
+def get_browser_cookies():
+    browsers = [
+        ('chrome',),
+        ('firefox',),
+        ('safari',),
+        ('edge',),
+        ('opera',),
+        ('brave',),
+    ]
+    
+    for browser in browsers:
+        try:
+            return {'cookiesfrombrowser': browser}
+        except:
+            continue
+    return {}  # Если ни один браузер не найден, возвращаем пустой словарь
+
 @app.route('/api/download', methods=['POST'])
 def download_video():
     data = request.get_json()
@@ -47,6 +64,7 @@ def download_video():
             os.makedirs(save_path, exist_ok=True)
             outtmpl = os.path.join(save_path, '%(title)s.%(ext)s')
             
+            # Базовые опции
             ydl_opts = {
                 'format': format_id if format_id else 'bestvideo+bestaudio/best',
                 'outtmpl': outtmpl,
@@ -60,8 +78,18 @@ def download_video():
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                     'Accept-Language': 'en-US,en;q=0.5',
+                    'Connection': 'keep-alive',
+                    'Upgrade-Insecure-Requests': '1',
+                    'Sec-Fetch-Dest': 'document',
+                    'Sec-Fetch-Mode': 'navigate',
+                    'Sec-Fetch-Site': 'none',
+                    'Sec-Fetch-User': '?1',
+                    'DNT': '1',
                 }
             }
+            
+            # Добавляем cookies из браузера, если доступны
+            ydl_opts.update(get_browser_cookies())
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 print(f"Начинаем скачивание: {url}")
@@ -108,11 +136,11 @@ def get_video_info():
         if not url:
             return jsonify({'error': 'URL не указан'}), 400
 
-        # Используем yt-dlp для всех URL
+        # Базовые опции
         ydl_opts = {
-            'quiet': False,  # Включаем вывод для отладки
+            'quiet': False,
             'no_warnings': False,
-            'extract_flat': False,  # Отключаем flat extraction
+            'extract_flat': False,
             'socket_timeout': 30,
             'format': 'best',
             'nocheckcertificate': True,
@@ -129,8 +157,12 @@ def get_video_info():
                 'Sec-Fetch-Mode': 'navigate',
                 'Sec-Fetch-Site': 'none',
                 'Sec-Fetch-User': '?1',
+                'DNT': '1',
             }
         }
+        
+        # Добавляем cookies из браузера, если доступны
+        ydl_opts.update(get_browser_cookies())
         
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
