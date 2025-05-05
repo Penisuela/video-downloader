@@ -126,12 +126,12 @@ def get_video_info():
             'nocheckcertificate': True,
             'ignoreerrors': True,
             'no_check_certificates': True,
-            'extractor_retries': 3,
-            'socket_timeout': 10,
+            'extractor_retries': 5,
+            'socket_timeout': 30,
             'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Safari/605.1.15',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
                 'Accept-Encoding': 'gzip, deflate, br',
                 'Connection': 'keep-alive',
                 'Upgrade-Insecure-Requests': '1',
@@ -139,8 +139,11 @@ def get_video_info():
                 'Sec-Fetch-Mode': 'navigate',
                 'Sec-Fetch-Site': 'none',
                 'Sec-Fetch-User': '?1',
-                'DNT': '1'
-            }
+                'DNT': '1',
+                'Cache-Control': 'max-age=0'
+            },
+            'cookiesfrombrowser': ('chrome',),
+            'cookiefile': 'cookies.txt'
         }
         
         try:
