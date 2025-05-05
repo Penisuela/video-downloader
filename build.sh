@@ -2,8 +2,8 @@
 # exit on error
 set -o errexit
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Create downloads directory
-mkdir -p static/downloads 
+python -m pip install --upgrade pip
+
+pip install gunicorn
